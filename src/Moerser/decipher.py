@@ -1,12 +1,16 @@
 from Moerser.utils import get_morse_alphabet
+from Moerser.utils import set_logger
 
 
 class Decipher:
 
-    def __init__(self):
+    def __init__(self, mode="debug"):
         self.morse_alphabet = get_morse_alphabet()
+        self.debug_level = mode
+        self.log = set_logger("Moerser - Decipher", mode=mode)
 
     def morse_to_binary(self, s_input):
+        self.log.debug("Translate morse to binary.")
         # split into character (spaces)
         replaces = {46: 48, 45: 49}
         s_input_binary = s_input.translate(replaces)
@@ -14,6 +18,7 @@ class Decipher:
         return ls_input_character
 
     def match_binary_to_alphabet(self, s_input="01"):
+        self.log.debug(f"Translate {s_input} to alphabet.")
         for character, code in self.morse_alphabet.items():
             if s_input == code:
                 return character
@@ -26,10 +31,12 @@ class Decipher:
         # groß/ kleinschreibung
         pass
 
-    def main(self, s_morse):
+    def execute(self, s_morse):
+        self.log.info(f"Input is: {s_morse}")
         ls_binary = self.morse_to_binary(s_morse)
         ls_phrase = list()
         for item in ls_binary:
             ls_phrase.append(self.match_binary_to_alphabet(item))
         s_phrase = "".join(ls_phrase)
+        self.log.info(f"output is: {s_phrase}")
         return s_phrase, ls_phrase

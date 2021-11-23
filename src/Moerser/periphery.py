@@ -10,3 +10,15 @@ class Camera:
 
     def image_to_morse(self, image, short=".", long="-", word_space=""):
         pass
+
+    def analyze_stream(self):
+        """
+        predict what's dot and whats dash based on whole stream.
+        :return:
+        """
+
+
+class Microphone:
+    def __init__(self, mode="debug"):
+        self.debug_level = mode
+        self.log = set_logger("Moerser - Microphone", mode=mode)

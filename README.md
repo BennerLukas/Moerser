@@ -1,5 +1,5 @@
 # Moerser
-Mörser - Autmoatic morsing system
+Mörser - Automatic morsing system
 
 [![GitHub issues](https://img.shields.io/github/issues/BennerLukas/Moerser)](https://github.com/BennerLukas/Moerser/issues)
 [![GitHub forks](https://img.shields.io/github/forks/BennerLukas/Moerser)](https://github.com/BennerLukas/Moerser/network)

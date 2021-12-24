@@ -12,7 +12,7 @@ class Decipher:
     def morse_to_binary(self, s_input):
         self.log.debug("Translate morse to binary.")
         # split into character (spaces)
-        replaces = {46: 48, 45: 49} # makes . to 0 and - to 1 (ASCII)
+        replaces = {46: 48, 45: 49}         # makes . to 0 and - to 1 (ASCII)
         s_input_binary = s_input.translate(replaces)
         ls_input_character = s_input_binary.split(" ")
         return ls_input_character

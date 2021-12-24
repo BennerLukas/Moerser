@@ -30,30 +30,38 @@ class Camera:
     def calc_mean_brightness(img):
         return img.mean(axis=0).mean(axis=0)
 
+    def record_sequence(self, iterations=10):
+        recorded_morse = list()
+        image = self.get_frame()
+        prev_brightness = self.calc_mean_brightness(image)
+
+        # initial guess
+        if prev_brightness > 200:       # big number -> bright -> 1
+            recorded_morse.append("H")
+        else:
+            recorded_morse.append("L")
+        self.log.info(f"Intial Guess {recorded_morse[-1]}")
+
+        tolerance = 0.25       # change must be at least 25% compared to before
+        frequency_delay = 1
+        while True:
+            image = self.get_frame()
+            brightness = self.calc_mean_brightness(image)
+            if brightness > prev_brightness * (1 + tolerance):      # significantly brighter than before
+                # change from dark to bright
+                recorded_morse.append("H")
+            elif prev_brightness > brightness * (1 + tolerance):    # significantly darker than before
+                # change from bright to dark
+                recorded_morse.append("L")
+            else:
+                last_item = len(recorded_morse) - 1
+                recorded_morse.append(recorded_morse[last_item])    # no change append last status again
+            time.sleep(frequency_delay)
+            self.log.info(recorded_morse[-1])   # log last entry
+
     def __del__(self):
         self.video_capture.release()
         cv.destroyAllWindows()
         self.log.info("Camera stopped")
         return ()
 
-    def record_sequence(self, iterations=10):
-        recorded_morse = list()
-        image = self.get_frame()
-        prev_brightness = self.calc_mean_brightness(image)
-
-        tolerance = 0.25       # change must be at least 25% compared to before
-        frequency_delay = 1
-        for i in range(iterations):
-            image = self.get_frame()
-            brightness = self.calc_mean_brightness(image)
-            if brightness > prev_brightness * (1 + tolerance):      # significantly brighter than before
-                # change from dark to bright
-                recorded_morse.append(1)
-            elif brightness < prev_brightness * (1 + tolerance):    # significantly darker than before
-                # change from bright to dark
-                recorded_morse.append(0)
-            else:
-                last_item = len(recorded_morse) - 1
-                recorded_morse.append(recorded_morse[last_item])    # no change append last status again
-            time.sleep(frequency_delay)
-        return recorded_morse

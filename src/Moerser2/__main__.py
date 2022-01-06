@@ -5,7 +5,7 @@ from periphery import Camera
 
 camera_p = Camera()
 frame_count = 0
-frame = 1 # Frame per second
+frames = 1 # Frame per second
 brightness_threshold = 0
 tolerance = 0.05
 bright_counter = 0
@@ -14,8 +14,8 @@ sequence = ""
 total_sequence = ""
 
 while True:
-    frame = cv2.imshow("webcam", camera_p.get_frame())
-    frame_brightness = Camera.calc_mean_brightness(camera_p.get_frame())
+    current_frame = camera_p.get_frame()
+    frame_brightness = Camera.calc_mean_brightness(current_frame)
     
     # If first frame -> set avg brightness 2 threshold
     if frame_count == 0:
@@ -33,23 +33,23 @@ while True:
         print(f"Current Darkness Counter: {darkness_counter}") 
         
         # Brightness
-        if bright_counter in range(1, 3):
-            sequence += "."
+        if bright_counter in range(1, (3*frames)):
+            sequence = "."
             #print(".")
             #bright_counter = 0 
-        elif bright_counter >= 3 :
-            sequence += "-"
+        elif bright_counter >= (3*frames) :
+            sequence = "-"
             #print("-")
             #bright_counter = 0
         
         # Darkness
-        if darkness_counter in range(1, 3):
+        if darkness_counter in range(1, (3*frames)):
             # next character in word
             total_sequence += sequence
             sequence = ""
             bright_counter = 0
             
-        elif darkness_counter > 7 :
+        elif darkness_counter > (7*frames) :
             # next word
             #total_sequence += sequence # not needed because a darkness_counter of 1 will push sequence already 
             #sequence = ""
@@ -64,6 +64,11 @@ while True:
 
     frame_count += 1
     
+    cv2.putText(current_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    
+    cv2.imshow("webcam", current_frame)
+    
+    
     if cv2.waitKey(1) & 0xFF == ord('q'): 
         break
-    cv2.waitKey(1000)# one frame per second
+    cv2.waitKey(500)# one frame per second

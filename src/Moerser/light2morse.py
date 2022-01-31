@@ -77,7 +77,7 @@ class Light2Morse:
 
         self.frame_count += 1
 
-        return self.total_sequence, self.bright_counter, self.darkness_counter,
+        return current_frame, self.total_sequence, self.bright_counter, self.darkness_counter,
 
         # cv2.putText(current_frame, f"Morse_Code: {self.total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
         #             (0, 0, 255), 2)

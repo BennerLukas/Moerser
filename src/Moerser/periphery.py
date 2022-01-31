@@ -10,6 +10,7 @@ class Camera:
         self.debug_level = mode
         self.log = set_logger("Moerser - Camera", mode=mode)
 
+        self.video_capture = cv.VideoCapture(2)
         self.video_capture = cv.VideoCapture(0)
         self.log.debug("Camera starting")
         time.sleep(1)

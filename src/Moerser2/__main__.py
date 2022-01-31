@@ -26,6 +26,8 @@ while True:
     if frame_brightness > brightness_threshold * (1 + tolerance):
         bright_counter += 1
         darkness_counter = 0
+        print(f"Current Brightness Counter: {bright_counter}")
+        print(f"Current Darkness Counter: {darkness_counter}")         
         
     else:
         # Decoding light to morse code
@@ -70,7 +72,9 @@ while True:
     cv2.putText(current_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
     # TODO: After space, translate current morse code
-     
+    # TODO: show current sequence in frame
+    # TODO: Button to initiate avg baseline
+    
     cv2.imshow("webcam", current_frame)
     
     

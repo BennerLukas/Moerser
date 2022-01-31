@@ -26,6 +26,7 @@ while True:
     if frame_brightness > brightness_threshold * (1 + tolerance):
         bright_counter += 1
         darkness_counter = 0
+        
     else:
         # Decoding light to morse code
         darkness_counter += 1
@@ -37,7 +38,7 @@ while True:
             sequence = "."
             #print(".")
             #bright_counter = 0 
-        elif bright_counter >= (3*frames) :
+        elif bright_counter >= (3*frames):
             sequence = "-"
             #print("-")
             #bright_counter = 0
@@ -53,7 +54,9 @@ while True:
             # next word
             #total_sequence += sequence # not needed because a darkness_counter of 1 will push sequence already 
             #sequence = ""
-            total_sequence += " "
+            if total_sequence[-1] != " ":
+                total_sequence += " "
+
             bright_counter = 0
         
 
@@ -66,6 +69,8 @@ while True:
     
     cv2.putText(current_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
+    # TODO: After space, translate current morse code
+     
     cv2.imshow("webcam", current_frame)
     
     

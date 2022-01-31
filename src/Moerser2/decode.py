@@ -9,7 +9,7 @@ class Decode:
     def calc_mean_brightness(self, img):
         return img.mean(axis=0).mean(axis=0)
 
-    def set_inital_brightnes(self):
+    def set_inital_brightness(self):
         # Set inital brighness to "train" the default/ ambiente brightness
         img = camera.get_frame()
         brightness = self.calc_mean_brightness(image)
@@ -17,7 +17,7 @@ class Decode:
 
     def execute(self):
         tolerance = 0.25
-        default_brightness = self.set_inital_brightnes()
+        default_brightness = self.set_inital_brightness()
 
         bright_counter = 0
         dark_counter = 0
@@ -34,13 +34,11 @@ class Decode:
             if frame_brightness >= brightness_threshold * (1 - tolerance):
                 # frame is bright
                 bright_counter+=1
-                continue
 
             # frame is dark
             # how high is the counter
             elif bright_counter == 0:
                 dark_counter += 1
-                continue
 
 
             # if frame_brightness == dark
@@ -53,9 +51,3 @@ class Decode:
                 elif bright_counter == 3:
                     sequence.append("-")
                     bright_counter == 0
-
-
-
-
-
-

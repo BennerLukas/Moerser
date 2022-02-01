@@ -9,7 +9,7 @@ class Light2Morse:
 
         self.log = set_logger("L2M", mode="debug")
 
-        self.camera_p = Camera()
+        # self.camera_p = Camera()
         self.frame_count = 0
         self.frames = 1  # Frame per second
         self.brightness_threshold = 0
@@ -20,15 +20,16 @@ class Light2Morse:
         self.total_sequence = " "
         self.frame_brightness = None
 
-    def init_brightness(self):
-        current_frame = self.camera_p.get_frame()
-        self.frame_brightness = self.camera_p.calc_mean_brightness(current_frame)
+    def init_brightness(self, current_frame):
+        # current_frame = self.camera_p.get_frame()
+        self.frame_brightness = Camera.calc_mean_brightness(current_frame)
         self.log.info(f"Threshold initiated  at {self.frame_brightness}")
         self.brightness_threshold = self.frame_brightness
 
-    def main(self):
-        current_frame = self.camera_p.get_frame()
-        self.frame_brightness = self.camera_p.calc_mean_brightness(current_frame)
+    def main(self, current_frame):
+        self.log.debug(current_frame)
+        # current_frame = self.camera_p.get_frame()
+        self.frame_brightness = Camera.calc_mean_brightness(current_frame)
 
         # If first frame -> set avg brightness 2 threshold
         if self.frame_count == 0:

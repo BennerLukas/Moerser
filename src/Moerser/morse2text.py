@@ -11,4 +11,4 @@ class Morse2Text:
     def decode(self, sequence):
         self.log.debug(sequence)
         text = ""
-        return text
+        return sequence

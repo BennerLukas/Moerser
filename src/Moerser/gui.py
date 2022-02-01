@@ -1,151 +1,163 @@
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import *
-from PyQt5.QtMultimedia import *
-from PyQt5.QtMultimediaWidgets import *
-import os
 import sys
-import time
+from PySide2.QtGui import QPixmap, QImage, QIcon
+from PySide2 import QtWidgets as QtW
+from PySide2.QtCore import QTimer
+import cv2
 
 from Moerser.light2morse import Light2Morse
+from Moerser.morse2text import Morse2Text
 from Moerser.utils import set_logger
 
+# used resources: https://github.com/yushulx/python/blob/master/examples/qt/barcode-reader.py
 
-class Interface(QMainWindow):
+
+class Interface(QtW.QWidget):
 
     def __init__(self):
-        super().__init__()
-        self.camera = None
+        QtW.QWidget.__init__(self)
 
         self.l2m = Light2Morse()
+        self.m2t = Morse2Text()
         self.log = set_logger("GUI", mode="debug")
+
+        self.total_sequence = None
+        self.video_capture = None
 
         # Create a timer.
         self.timer = QTimer()
-        self.timer.timeout.connect(self.decode_morse)
+        self.timer.timeout.connect(self.nextFrameSlot)
 
-        # setting geometry
-        self.setGeometry(100, 100,
-                         800, 600)
+        # Create a layout.
+        layout = QtW.QVBoxLayout()
 
-        # setting style sheet
-        self.setStyleSheet("background : white;")
-
-        # getting available cameras
-        self.available_cameras = QCameraInfo.availableCameras()
-
-        # if no camera found
-        if not self.available_cameras:
-            # exit the code
-            self.log.error("No Camera found.")
-            sys.exit()
-
-        # creating a status bar
-        self.status = QStatusBar()
-
-        # setting style sheet to the status bar
-        self.status.setStyleSheet("background : white;")
-
-        # adding status bar to the main window
-        self.setStatusBar(self.status)
-
-        # creating a QCameraViewfinder object
-        self.viewfinder = QCameraViewfinder()
-
-        # showing this viewfinder
-        self.viewfinder.show()
-
-        # making it central widget of main window
-        self.setCentralWidget(self.viewfinder)
-
-        # Set the default camera.
-        self.select_camera(0)
-
-        # creating a tool bar
-        toolbar = QToolBar("Mörser Tool Bar")
-
-        # adding tool bar to main window
-        self.addToolBar(toolbar)
-
-        # Start
-        start = QAction("Start", self)
-        start.triggered.connect(self.start_timer)
-        start.setStatusTip("Start the decoding")
-        start.setToolTip("Start the decoding")
-        toolbar.addAction(start)
-
-        # Stop
-        stop = QAction("Pause", self)
-        stop.triggered.connect(self.stop_timer)
-        stop.setStatusTip("Stop the decoding")
-        stop.setToolTip("stop the decoding")
-        toolbar.addAction(stop)
-
-        # Sync
-        sync = QAction("Sync", self)
-        sync.triggered.connect(self.exec_sync)
-        sync.setStatusTip("Init brightness values again")
-        sync.setToolTip("Init brightness values again")
-        toolbar.addAction(sync)
-
-        # Analyze Sequence
-        analyze = QAction("Analyze Sequence")
-        analyze.triggered.connect(self.exec_analzye)
-        analyze.setStatusTip("Analyze the Sequence to repair errors")
-        analyze.setToolTip("Analyze the Sequence to repair errors")
-        toolbar.addAction(analyze)
-
-        # Encode Text
-        encode = QAction("Encode Text", self)
-        encode.triggered.connect(self.exec_encode)
-        encode.setStatusTip("Morse text to others via light")
-        encode.setToolTip("Morse text to others via light")
-        toolbar.addAction(encode)
-
-        # creating a combo box for selecting camera
-        camera_selector = QComboBox()
-        camera_selector.setStatusTip("Choose camera to take pictures")
-        camera_selector.setToolTip("Select Camera")
-        camera_selector.setToolTipDuration(2500)
-        camera_selector.addItems([camera.description() for camera in self.available_cameras])
-        # adding action to the combo box
-        # calling the select camera method
-        camera_selector.currentIndexChanged.connect(self.select_camera)
-        # adding this to toolbar
-        toolbar.addWidget(camera_selector)
-
-        # setting toolbar stylesheet
-        toolbar.setStyleSheet("background : lightgrey;")
+        toolbar = self._toolbox()
+        layout.addLayout(toolbar)
 
         # setting window title
         self.setWindowTitle("Mörser")
 
-        # showing the main window
-        self.show()
+        # Add a label
+        self.label = QtW.QLabel()
+        self.label.setFixedSize(640, 640)
+        layout.addWidget(self.label)
+
+        # Add a text area
+        self.results = QtW.QTextEdit()
+        layout.addWidget(self.results)
+
+        # Set the layout
+        self.setLayout(layout)
+        self.setFixedSize(640, 750)
+        self.setWindowIcon(QIcon("assets/logo_simple_small.png"))
+        self.setWindowIconText("logo")
+
+        self._start_timer()
+
+    def _toolbox(self):
+        # creating a toolbar
+        toolbar = QtW.QGridLayout()
+
+        # # adding toolbar to main window
+        # self.addToolBar(toolbar)
+
+        # Start
+        start = QtW.QPushButton("Start", self)
+        start.clicked.connect(self._start_timer)
+        start.setToolTip("Start the decoding")
+        start.setIcon(QIcon("assets/play.svg"))
+        toolbar.addWidget(start, 0, 0)
+
+        # Stop
+        stop = QtW.QPushButton("Pause", self)
+        stop.clicked.connect(self._stop_timer)
+        stop.setToolTip("stop the decoding")
+        stop.setIcon(QIcon("assets/pause.svg"))
+        toolbar.addWidget(stop, 0, 1)
+
+        # Sync
+        sync = QtW.QPushButton("Sync", self)
+        sync.clicked.connect(self.exec_sync)
+        sync.setToolTip("Init brightness values again")
+        sync.setIcon(QIcon("assets/arrow-repeat.svg"))
+        toolbar.addWidget(sync, 0, 2)
+
+        # Analyze Sequence
+        analyze = QtW.QPushButton("Analyze Sequence", self)
+        analyze.clicked.connect(self.exec_analzye)
+        analyze.setToolTip("Analyze the Sequence to repair errors")
+        analyze.setIcon(QIcon("assets/search.svg"))
+        toolbar.addWidget(analyze, 1, 0)
+
+        # Encode Text
+        encode = QtW.QPushButton("Encode Text", self)
+        encode.clicked.connect(self.exec_encode)
+        encode.setToolTip("Morse text to others via light")
+        encode.setIcon(QIcon("assets/pencil.svg"))
+        toolbar.addWidget(encode, 1, 1)
+
+        # setting toolbar stylesheet
+        # toolbar.setStyleSheet("background : lightgrey;")
+
+        return toolbar
+
+    # https://stackoverflow.com/questions/1414781/prompt-on-exit-in-pyqt-application
+    def closeEvent(self, event):
+
+        msg = "Close the app?"
+        reply = QtW.QMessageBox.question(self, 'Mörser - Message',
+                                         msg, QtW.QMessageBox.Yes, QtW.QMessageBox.No)
+
+        if reply == QtW.QMessageBox.Yes:
+            event.accept()
+            self._stop_timer()
+        else:
+            event.ignore()
+
+    def openCamera(self):  # TODO move to periphery
+        self.video_capture = cv2.VideoCapture(0)
+        # vc.set(5, 30)  #set FPS
+        self.video_capture.set(3, 640)  # set width
+        self.video_capture.set(4, 480)  # set height
+
+        if not self.video_capture.isOpened():
+            msgBox = QtW.QMessageBox()
+            msgBox.setText("Failed to open camera.")
+            msgBox.exec_()
+            return
+
+    def _start_timer(self):
+        self.openCamera()
+        self.timer.start(800)
+
+    def _stop_timer(self):
+        self.timer.stop()
 
     def _dialog(self, text, detail_text=""):
-        mbox = QMessageBox()
+        mbox = QtW.QMessageBox()
         mbox.setWindowTitle("Mörser - Dialog")
         mbox.setText(text)
         mbox.setDetailedText(detail_text)
-        mbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        mbox.setStandardButtons(QtW.QMessageBox.Ok | QtW.QMessageBox.Cancel)
 
         mbox.exec_()
 
-    def _input(self, text):
-        text, ok = QInputDialog.getText(QWidget, " Text to encode", "Enter text:")
+    def _input(self):
+        text, ok = QtW.QInputDialog.getText(self, " Text to encode", "Enter text:")
         self.log.debug(text)
         self.log.debug(ok)
         return text
 
     def exec_sync(self):
         self.log.debug("init brightness again")
-        # call to init_brightness()
+        _, grey_frame, _ = self.get_image()
+        brightness_threshold = self.l2m.init_brightness(grey_frame)
 
-        self._dialog(text="Sync Done", detail_text="The brightness was calibrated again.")
+        self._dialog(text="Sync Done", detail_text=f"The brightness was calibrated again to {brightness_threshold}.")
 
     def exec_analzye(self):
         self.log.debug("Analyze the Sequence to repair errors")
         # call analyze()
+        text = self.m2t.decode(self.total_sequence)
         text = "This is a sample Text"
 
         self._dialog(text="Analyze successful", detail_text=f"Following text is recognized: \n ----- \n {text}")
@@ -155,68 +167,40 @@ class Interface(QMainWindow):
         # open input field
         text = self._input()
 
-    def start_timer(self):
-        self.timer.start(800)
+    def get_image(self):    # TODO move to periphery
+        rval, frame = self.video_capture.read()
 
-    def stop_timer(self):
-        self.timer.stop()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    def select_camera(self, i):
-        # getting the selected camera
-        self.camera = QCamera(self.available_cameras[i])
+        image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
+        return frame, grey_frame, image
 
-        # setting view finder to the camera
-        self.camera.setViewfinder(self.viewfinder)
+    # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
+    def nextFrameSlot(self):
+        frame, grey_frame, image = self.get_image()
 
-        # setting capture mode to the camera
-        self.camera.setCaptureMode(QCamera.CaptureStillImage)  # TODO maybe video
+        image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(image)
+        self.label.setPixmap(pixmap)
 
-        # if any error occur show the alert
-        self.camera.error.connect(lambda: self.alert(self.camera.errorString()))
+        self.total_sequence, bright_counter, darkness_counter = self.l2m.main(grey_frame)
 
-        # start the camera
-        self.camera.start()
+        self.log.debug(f"total_sequence: {self.total_sequence}")
+        self.log.debug(f"bright_counter: {bright_counter}")
+        self.log.debug(f"darkness_counter: {darkness_counter}")
 
-        # creating a QCameraImageCapture object
-        self.capture = QCameraImageCapture(self.camera)
+        text = self.m2t.decode(self.total_sequence)
 
-        # showing alert if error occur
-        self.capture.error.connect(lambda error_msg, error,
-                                          msg: self.alert(msg))
+        self.results.setText(str(bright_counter))
 
-        # when image captured showing message
-        self.capture.imageCaptured.connect(lambda d,
-                                                  i: self.status.showMessage("Image captured : "
-                                                                             + str(self.save_seq)))
 
-        # getting current camera name
-        self.current_camera_name = self.available_cameras[i].description()
-
-        # initial save sequence
-        self.save_seq = 0
-
-        # self.timer.start(1000. / 24)
-
-    def alert(self, msg):
-        # error message
-        error = QErrorMessage(self)
-
-        # setting text to the error message
-        error.showMessage(msg)
-
-    def decode_morse(self):
-        self.log.debug(self.capture)
-        self.log.debug(self.capture.capture())
-
-        self.l2m.main(self.capture)
+def main():
+    app = QtW.QApplication(sys.argv)
+    ex = Interface()
+    ex.show()
+    sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
-    # create pyqt5 app
-    App = QApplication(sys.argv)
-
-    # create the instance of our Window
-    window = Interface()
-
-    # start the app
-    sys.exit(App.exec())
+    main()

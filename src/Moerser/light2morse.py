@@ -26,6 +26,8 @@ class Light2Morse:
         self.log.info(f"Threshold initiated  at {self.frame_brightness}")
         self.brightness_threshold = self.frame_brightness
 
+        return self.brightness_threshold
+
     def main(self, current_frame):
         self.log.debug(current_frame)
         # current_frame = self.camera_p.get_frame()

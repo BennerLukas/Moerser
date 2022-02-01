@@ -150,16 +150,16 @@ class UI_Window(QWidget):
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)
         self.label.setPixmap(pixmap)
-
-        results = dbr.decodeBuffer(frame, 0x3FF | 0x2000000 | 0x4000000 | 0x8000000 | 0x10000000)
+        print(frame)
+        # results = dbr.decodeBuffer(frame, 0x3FF | 0x2000000 | 0x4000000 | 0x8000000 | 0x10000000)
         out = ''
         index = 0
-        for result in results:
-            out += "Index: " + str(index) + "\n"
-            out += "Barcode format: " + result[0] + '\n'
-            out += "Barcode value: " + result[1] + '\n'
-            out += '-----------------------------------\n'
-            index += 1
+        # for result in results:
+        #     out += "Index: " + str(index) + "\n"
+        #     out += "Barcode format: " + result[0] + '\n'
+        #     out += "Barcode value: " + result[1] + '\n'
+        #     out += '-----------------------------------\n'
+        #     index += 1
 
         self.results.setText(out)
 

@@ -33,7 +33,7 @@ class Light2Morse:
 
         # If first frame -> set avg brightness 2 threshold
         if self.frame_count == 0:
-            self.init_brightness()
+            self.init_brightness(current_frame)
 
         # Track brightness
         if self.frame_brightness > self.brightness_threshold * (1 + self.tolerance):
@@ -78,7 +78,7 @@ class Light2Morse:
 
         self.frame_count += 1
 
-        return current_frame, self.total_sequence, self.bright_counter, self.darkness_counter,
+        return self.total_sequence, self.bright_counter, self.darkness_counter
 
         # cv2.putText(current_frame, f"Morse_Code: {self.total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
         #             (0, 0, 255), 2)

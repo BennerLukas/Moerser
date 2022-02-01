@@ -1,3 +1,5 @@
-pyqt5
 numpy
 setuptools
+opencv-python
+PySide2
+matplotlib

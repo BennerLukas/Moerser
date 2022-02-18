@@ -20,7 +20,8 @@ class Morse2Text:
                 if char in self.morse_alphabet:
                     word.append(self.morse_alphabet[char])
                 else:
-                    word.append("_")
+                    if char != "":
+                        word.append("_")
             
             text.append(''.join(word))
             

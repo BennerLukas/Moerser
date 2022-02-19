@@ -1,5 +1,3 @@
-import cv2
-from matplotlib import pyplot as plt
 from Moerser.utils import set_logger, get_morse_alphabet
 
 
@@ -12,7 +10,7 @@ class Morse2Text:
         self.log.debug(sequence)
         text = []
         sequence = sequence.split(" ")
-        
+
         for subseq in sequence:
             word = []
             characters = subseq.split("/")
@@ -22,11 +20,12 @@ class Morse2Text:
                 else:
                     if char != "":
                         word.append("_")
-            
+
             text.append(''.join(word))
-            
+
         return ' '.join(text)
+
 
 if __name__ == "__main__":
     decoder = Morse2Text()
-    print(decoder.decode(".../---/... -. --/-.")) # testing
+    print(decoder.decode(".../---/... -. --/-."))  # testing

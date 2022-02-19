@@ -1,7 +1,7 @@
 import cv2
 from matplotlib import pyplot as plt
 from Moerser.utils import set_logger
-from Moerser.periphery import Camera
+from Moerser.utils.periphery import Camera
 
 
 class Light2Morse:

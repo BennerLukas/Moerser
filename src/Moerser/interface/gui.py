@@ -4,13 +4,14 @@ from PySide2 import QtWidgets as QtW
 from PySide2.QtCore import QTimer
 import cv2
 
-from Moerser.light2morse import Light2Morse
-from Moerser.morse2text import Morse2Text
+from Moerser.core.light2morse import Light2Morse
+from Moerser.core.morse2text import Morse2Text
+from Moerser.core.text2light import Text2Light
+from Moerser.interface.blinker import Blinker
 from Moerser.utils import set_logger
 
-# used resources: https://github.com/yushulx/python/blob/master/examples/qt/barcode-reader.py
 
-
+# helping resources for GUI: https://github.com/yushulx/python/blob/master/examples/qt/barcode-reader.py
 class Interface(QtW.QWidget):
 
     def __init__(self):
@@ -18,6 +19,7 @@ class Interface(QtW.QWidget):
 
         self.l2m = Light2Morse()
         self.m2t = Morse2Text()
+        self.t2l = Text2Light()
         self.log = set_logger("GUI", mode="debug")
 
         self.total_sequence = None
@@ -48,7 +50,7 @@ class Interface(QtW.QWidget):
         # Set the layout
         self.setLayout(layout)
         self.setFixedSize(640, 750)
-        self.setWindowIcon(QIcon("assets/logo_simple_small.png"))
+        self.setWindowIcon(QIcon("../assets/logo_simple_small.png"))
         self.setWindowIconText("logo")
 
         self._start_timer()
@@ -64,35 +66,35 @@ class Interface(QtW.QWidget):
         start = QtW.QPushButton("Start", self)
         start.clicked.connect(self._start_timer)
         start.setToolTip("Start the decoding")
-        start.setIcon(QIcon("assets/play.svg"))
+        start.setIcon(QIcon("../assets/play.svg"))
         toolbar.addWidget(start, 0, 0)
 
         # Stop
         stop = QtW.QPushButton("Pause", self)
         stop.clicked.connect(self._stop_timer)
         stop.setToolTip("stop the decoding")
-        stop.setIcon(QIcon("assets/pause.svg"))
+        stop.setIcon(QIcon("../assets/pause.svg"))
         toolbar.addWidget(stop, 0, 1)
 
         # Sync
         sync = QtW.QPushButton("Sync", self)
         sync.clicked.connect(self.exec_sync)
         sync.setToolTip("Init brightness values again")
-        sync.setIcon(QIcon("assets/arrow-repeat.svg"))
+        sync.setIcon(QIcon("../assets/arrow-repeat.svg"))
         toolbar.addWidget(sync, 0, 2)
 
         # Analyze Sequence
         analyze = QtW.QPushButton("Analyze Sequence", self)
         analyze.clicked.connect(self.exec_analzye)
         analyze.setToolTip("Analyze the Sequence to repair errors")
-        analyze.setIcon(QIcon("assets/search.svg"))
+        analyze.setIcon(QIcon("../assets/search.svg"))
         toolbar.addWidget(analyze, 1, 0)
 
         # Encode Text
         encode = QtW.QPushButton("Encode Text", self)
         encode.clicked.connect(self.exec_encode)
         encode.setToolTip("Morse text to others via light")
-        encode.setIcon(QIcon("assets/pencil.svg"))
+        encode.setIcon(QIcon("../assets/pencil.svg"))
         toolbar.addWidget(encode, 1, 1)
 
         # setting toolbar stylesheet
@@ -167,7 +169,9 @@ class Interface(QtW.QWidget):
         self.log.debug("Morse text to others via light")
         # open input field
         text = self._input()
-        # TODO flashing morse signal needed
+        seq = self.t2l.encode(text)
+
+        Blinker(seq)    # TODO flashing morse signal needed
 
     def get_image(self):    # TODO move to periphery
         rval, frame = self.video_capture.read()

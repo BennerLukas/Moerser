@@ -169,7 +169,7 @@ class Interface(QMainWindow):
         self.camera.setViewfinder(self.viewfinder)
 
         # setting capture mode to the camera
-        self.camera.setCaptureMode(QCamera.CaptureStillImage)  # TODO maybe video
+        self.camera.setCaptureMode(QCamera.CaptureStillImage)
 
         # if any error occur show the alert
         self.camera.error.connect(lambda: self.alert(self.camera.errorString()))

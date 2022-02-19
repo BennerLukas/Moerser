@@ -22,6 +22,9 @@ class Interpreter:
     def set_baseline(self, current_frame):
         """
         sets the current frame as the base brightness
+
+        :param current_frame:
+        :return:
         """
         # current_frame = self.capture.get_frame()
         self.brightness_threshold = Camera.calc_mean_brightness(current_frame)
@@ -30,6 +33,12 @@ class Interpreter:
         return self.brightness_threshold
 
     def check_brightness(self, frame_brightness, tolerance=0.05):
+        """
+
+        :param frame_brightness:
+        :param tolerance:
+        :return:
+        """
         if frame_brightness > self.brightness_threshold * (1 + tolerance):
 
             if self.darkness_counter != 0:
@@ -78,6 +87,12 @@ class Interpreter:
         return current_sequence
 
     def interpret_brightness(self, counter, frames=1):
+        """
+
+        :param counter:
+        :param frames:
+        :return:
+        """
         sequence = ""
         if counter in range(1, (5 * frames)):  # Dit
             sequence = "."
@@ -91,6 +106,12 @@ class Interpreter:
         return sequence
 
     def interpret_darkness(self, counter, frames=1):
+        """
+
+        :param counter:
+        :param frames:
+        :return:
+        """
         sequence = ""
         if counter in range(1, (4 * frames)):  # Next sequence in Letter
             sequence = ""
@@ -104,6 +125,11 @@ class Interpreter:
         return sequence
 
     def main(self, current_frame):
+        """
+
+        :param current_frame:
+        :return:
+        """
         frame_brightness = Camera.calc_mean_brightness(current_frame)
 
         # If first frame -> set avg brightness 2 threshold

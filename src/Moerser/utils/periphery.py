@@ -14,10 +14,20 @@ class Camera:
         self.video_capture = None
 
     @staticmethod
-    def calc_mean_brightness(img):  # TODO sync on dark --> easier?
+    def calc_mean_brightness(img):
+        """
+
+        :param img:
+        :return:
+        """
         return img.mean(axis=0).mean(axis=0)
 
     def openCamera(self, camera_number=0):
+        """
+
+        :param camera_number:
+        :return:
+        """
         self.video_capture = cv2.VideoCapture(camera_number)
         # vc.set(5, 30)  #set FPS
         self.video_capture.set(3, 640)  # set width
@@ -31,6 +41,10 @@ class Camera:
             return False
 
     def get_image(self):
+        """
+
+        :return:
+        """
         rval, frame = self.video_capture.read()
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

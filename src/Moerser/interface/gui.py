@@ -64,6 +64,10 @@ class Interface(QtW.QWidget):
         self._start_timer()
 
     def _toolbox(self):
+        """
+
+        :return:
+        """
         # creating a toolbar
         toolbar = QtW.QGridLayout()
 
@@ -119,6 +123,11 @@ class Interface(QtW.QWidget):
 
     # https://stackoverflow.com/questions/1414781/prompt-on-exit-in-pyqt-application
     def closeEvent(self, event):
+        """
+
+        :param event:
+        :return:
+        """
 
         msg = "Close the app?"
         reply = QtW.QMessageBox.question(self, 'Mörser - Message',
@@ -131,13 +140,27 @@ class Interface(QtW.QWidget):
             event.ignore()
 
     def _start_timer(self):
+        """
+
+        :return:
+        """
         self.Camera.openCamera()
         self.timer.start(1)
 
     def _stop_timer(self):
+        """
+
+        :return:
+        """
         self.timer.stop()
 
     def _dialog(self, text, detail_text=""):
+        """
+
+        :param text:
+        :param detail_text:
+        :return:
+        """
         mbox = QtW.QMessageBox()
         mbox.setWindowTitle("Mörser - Dialog")
         mbox.setText(text)
@@ -147,12 +170,20 @@ class Interface(QtW.QWidget):
         mbox.exec_()
 
     def _input(self):
+        """
+
+        :return:
+        """
         text, ok = QtW.QInputDialog.getText(self, " Text to encode", "Enter text:")
         self.log.debug(text)
         self.log.debug(ok)
         return text
 
     def exec_sync(self):
+        """
+
+        :return:
+        """
         self.log.debug("init brightness again")
         _, grey_frame, bw_frame, _ = self.Camera.get_image()
         brightness_threshold = self.Interpreter.set_baseline(bw_frame)
@@ -160,6 +191,10 @@ class Interface(QtW.QWidget):
         self._dialog(text="Sync Done", detail_text=f"The brightness was calibrated again to {brightness_threshold}.")
 
     def exec_clear(self):
+        """
+
+        :return:
+        """
         self.log.debug("Clear the current sequence")
         self.total_sequence = ""
         self.Interpreter = Interpreter()
@@ -168,6 +203,10 @@ class Interface(QtW.QWidget):
         self._dialog(text="Clear successful", detail_text=f"Following sequence is deleted: \n ----- \n {self.total_sequence}")
 
     def exec_encode(self):
+        """
+
+        :return:
+        """
         self.log.debug("Morse text to others via light")
         # open input field
         text = self._input()
@@ -175,12 +214,20 @@ class Interface(QtW.QWidget):
         Blinker(seq, self.frame_throttle)
 
     def exec_help(self):
+        """
+
+        :return:
+        """
         self.log.debug("Open help")
         url = "https://github.com/BennerLukas/Moerser/"
         webbrowser.open(url)
 
     # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
     def nextFrameSlot(self):
+        """
+
+        :return:
+        """
         self.nowTime = time.time()
 
         frame, grey_frame, bw_frame, image = self.Camera.get_image()

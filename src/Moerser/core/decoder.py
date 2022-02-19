@@ -7,6 +7,12 @@ class Decoder:
         self.morse_alphabet = get_morse_alphabet()
 
     def decode(self, sequence):
+        """
+        decipher an given sequence
+
+        :param sequence:
+        :return:
+        """
         self.log.debug(sequence)
         text = []
         sequence = sequence.split(" ")

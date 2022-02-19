@@ -89,7 +89,6 @@ while True:
     cv2.putText(current_frame, f"Decoded_Sequence: {decoder.decode(total_sequence)}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     cv2.putText(current_frame, f"Light - {bright_counter}; Dark - {darkness_counter}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-    # TODO: Button to initiate avg baseline
 
     cv2.imshow("webcam", current_frame)
 

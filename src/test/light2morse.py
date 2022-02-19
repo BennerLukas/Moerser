@@ -83,9 +83,7 @@ class Light2Morse:
         # cv2.putText(current_frame, f"Morse_Code: {self.total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
         #             (0, 0, 255), 2)
         #
-        # # TODO: After space, translate current morse code
-        # # TODO: show current sequence in frame
-        # # TODO: Button to initiate avg baseline
+
         #
         # cv2.imshow("webcam", current_frame)
         #

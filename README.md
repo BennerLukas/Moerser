@@ -22,8 +22,18 @@
     ```bash
     python ./src/Moerser/interface/gui.py
     ```
-## Idea
+   
+## User Interface
 
-## Team
+[//]: # (List all functions)
+[//]: # (screenshots)
 
-## Technology
+## Morse Notation
+
+### Mörser Specific Notation
+
+## Image Preprocessing
+
+### Naive Approach
+
+### Binary Approach

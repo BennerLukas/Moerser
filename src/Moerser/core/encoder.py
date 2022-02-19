@@ -15,11 +15,21 @@ class Encoder:
         self.dash = 5
 
     def encode(self, text):
+        """
+
+        :param text:
+        :return:
+        """
         morse_seq = self.morse_encode(text)
         light_seq = self.light_encode(morse_seq)
         return light_seq
 
     def morse_encode(self, text):
+        """
+
+        :param text:
+        :return:
+        """
         self.log.debug(text)
         text = text.lower()
 
@@ -49,6 +59,11 @@ class Encoder:
         return morse_sequence
 
     def light_encode(self, morse_sequence):
+        """
+
+        :param morse_sequence:
+        :return:
+        """
         sequence = []
         for character in morse_sequence:
             if character == ".":

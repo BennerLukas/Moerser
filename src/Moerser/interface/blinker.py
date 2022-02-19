@@ -21,6 +21,10 @@ class Blinker:
         self.root.mainloop()
 
     def ChangeColor(self):
+        """
+
+        :return:
+        """
         self.frame.config(bg=next(self.color_gen))
         self.root.after(self.timing, self.ChangeColor)
 

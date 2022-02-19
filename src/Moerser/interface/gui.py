@@ -3,11 +3,11 @@ from PySide2.QtGui import QPixmap, QImage, QIcon
 from PySide2 import QtWidgets as QtW
 from PySide2.QtCore import QTimer
 
-from Moerser.core.light2morse import Light2Morse
-from Moerser.core.morse2text import Morse2Text
-from Moerser.core.text2light import Text2Light
+from Moerser.core.decoder import Decoder
+from Moerser.core.encoder import Encoder
 from Moerser.interface.blinker import Blinker
 from Moerser.utils.periphery import Camera
+from Moerser.core.interpreter import Interpreter
 from Moerser.utils import set_logger
 
 
@@ -17,13 +17,16 @@ class Interface(QtW.QWidget):
     def __init__(self):
         QtW.QWidget.__init__(self)
 
-        self.l2m = Light2Morse()
-        self.m2t = Morse2Text()
-        self.t2l = Text2Light()
+        # self.l2m = Light2Morse()
+        self.m2t = Decoder()
+        self.t2l = Encoder()
         self.Camera = Camera()
+        self.Interpreter = Interpreter()
+
         self.log = set_logger("GUI", mode="debug")
 
         self.total_sequence = None
+        self.frame_counter = 800
         self.video_capture = None
 
         # Create a timer.
@@ -118,7 +121,7 @@ class Interface(QtW.QWidget):
 
     def _start_timer(self):
         self.Camera.openCamera()
-        self.timer.start(800)
+        self.timer.start(1)
 
     def _stop_timer(self):
         self.timer.stop()
@@ -141,7 +144,7 @@ class Interface(QtW.QWidget):
     def exec_sync(self):
         self.log.debug("init brightness again")
         _, grey_frame, _ = self.Camera.get_image()
-        brightness_threshold = self.l2m.init_brightness(grey_frame)
+        brightness_threshold = self.Interpreter.set_baseline(grey_frame)
 
         self._dialog(text="Sync Done", detail_text=f"The brightness was calibrated again to {brightness_threshold}.")
 
@@ -163,21 +166,29 @@ class Interface(QtW.QWidget):
 
     # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
     def nextFrameSlot(self):
+        self.frame_counter += 1
+
         frame, grey_frame, image = self.Camera.get_image()
 
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)
         self.label.setPixmap(pixmap)
 
-        self.total_sequence, bright_counter, darkness_counter = self.l2m.main(grey_frame)   # TODO needs other information
+        if self.frame_counter < 25:
+            return False
+        else:
+            self.total_sequence, bright_counter, darkness_counter, translation, sequence = self.Interpreter.main(grey_frame)
 
-        self.log.debug(f"total_sequence: {self.total_sequence}")
-        self.log.debug(f"bright_counter: {bright_counter}")
-        self.log.debug(f"darkness_counter: {darkness_counter}")
+            self.log.debug(f"total_sequence: {self.total_sequence}")
+            self.log.debug(f"bright_counter: {bright_counter}")
+            self.log.debug(f"darkness_counter: {darkness_counter}")
 
-        text = self.m2t.decode(self.total_sequence)
+            # translation = self.m2t.decode(self.total_sequence)
 
-        self.results.setText(str(bright_counter))
+            text = f"Total Input: {self.total_sequence}\nCurrent Input: {sequence}\nTranslation: {translation}\nbright_counter: {bright_counter}    |    darkness_counter: {darkness_counter}"
+            self.results.setText(text)
+            self.frame_counter = 0
+            return True
 
 
 def main():

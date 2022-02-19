@@ -1,7 +1,7 @@
 from Moerser.utils import set_logger, get_morse_alphabet
 
 
-class Morse2Text:
+class Decoder:
     def __init__(self):
         self.log = set_logger("M2T", mode="debug")
         self.morse_alphabet = get_morse_alphabet()
@@ -27,5 +27,5 @@ class Morse2Text:
 
 
 if __name__ == "__main__":
-    decoder = Morse2Text()
+    decoder = Decoder()
     print(decoder.decode(".../---/... -. --/-."))  # testing

@@ -1,5 +1,3 @@
-import cv2
-from matplotlib import pyplot as plt
 from Moerser.utils import set_logger
 from Moerser.utils.periphery import Camera
 

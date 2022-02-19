@@ -1,7 +1,7 @@
 from Moerser.utils import set_logger, get_morse_alphabet
 
 
-class Text2Light:
+class Encoder:
     def __init__(self):
 
         self.log = set_logger("L2M", mode="debug")
@@ -11,8 +11,3 @@ class Text2Light:
         self.log.debug(text)    # TODO missing logic
         sequence = ["white", "white", "black", "white", "white", "black"]
         return sequence
-
-    def get_time_sequence(self, sequence):
-        self.log.debug(sequence)
-        brightness = []
-        return brightness

@@ -2,12 +2,12 @@ import sys
 from PySide2.QtGui import QPixmap, QImage, QIcon
 from PySide2 import QtWidgets as QtW
 from PySide2.QtCore import QTimer
-import cv2
 
 from Moerser.core.light2morse import Light2Morse
 from Moerser.core.morse2text import Morse2Text
 from Moerser.core.text2light import Text2Light
 from Moerser.interface.blinker import Blinker
+from Moerser.utils.periphery import Camera
 from Moerser.utils import set_logger
 
 
@@ -20,6 +20,7 @@ class Interface(QtW.QWidget):
         self.l2m = Light2Morse()
         self.m2t = Morse2Text()
         self.t2l = Text2Light()
+        self.Camera = Camera()
         self.log = set_logger("GUI", mode="debug")
 
         self.total_sequence = None
@@ -115,20 +116,8 @@ class Interface(QtW.QWidget):
         else:
             event.ignore()
 
-    def openCamera(self):  # TODO move to periphery
-        self.video_capture = cv2.VideoCapture(0)
-        # vc.set(5, 30)  #set FPS
-        self.video_capture.set(3, 640)  # set width
-        self.video_capture.set(4, 480)  # set height
-
-        if not self.video_capture.isOpened():
-            msgBox = QtW.QMessageBox()
-            msgBox.setText("Failed to open camera.")
-            msgBox.exec_()
-            return
-
     def _start_timer(self):
-        self.openCamera()
+        self.Camera.openCamera()
         self.timer.start(800)
 
     def _stop_timer(self):
@@ -151,7 +140,7 @@ class Interface(QtW.QWidget):
 
     def exec_sync(self):
         self.log.debug("init brightness again")
-        _, grey_frame, _ = self.get_image()
+        _, grey_frame, _ = self.Camera.get_image()
         brightness_threshold = self.l2m.init_brightness(grey_frame)
 
         self._dialog(text="Sync Done", detail_text=f"The brightness was calibrated again to {brightness_threshold}.")
@@ -170,21 +159,11 @@ class Interface(QtW.QWidget):
         # open input field
         text = self._input()
         seq = self.t2l.encode(text)
-
-        Blinker(seq)    # TODO flashing morse signal needed
-
-    def get_image(self):    # TODO move to periphery
-        rval, frame = self.video_capture.read()
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-        return frame, grey_frame, image
+        Blinker(seq)
 
     # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
     def nextFrameSlot(self):
-        frame, grey_frame, image = self.get_image()
+        frame, grey_frame, image = self.Camera.get_image()
 
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)

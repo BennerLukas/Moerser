@@ -1,68 +1,40 @@
-import cv2 as cv
+from PySide2.QtGui import QImage
+from PySide2 import QtWidgets as QtW
+import cv2
 from Moerser.utils import set_logger
-import time
 
 
 class Camera:
 
-    def __init__(self, camera_id, mode="debug"):
+    def __init__(self, mode="debug"):
 
         self.debug_level = mode
         self.log = set_logger("Moerser - Camera", mode=mode)
 
-        #self.video_capture = cv.VideoCapture(camera_id)
-        self.video_capture = cv.VideoCapture(camera_id)
-        self.log.debug("Camera starting")
-        time.sleep(1)
-        self.returned, self.frame = self.video_capture.read()
-        time.sleep(1)
-
-    # Frame generation for Browser streaming
-    def get_frame(self):
-        returned, image = self.video_capture.read()
-        if not returned:
-            self.log.error("Can't receive frame (stream end?). Exiting ...")
-            raise
-        gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-        return gray_image
+        self.video_capture = None
 
     @staticmethod
     def calc_mean_brightness(img):
         return img.mean(axis=0).mean(axis=0)
 
-    def record_sequence(self, iterations=10):
-        recorded_morse = list()
-        image = self.get_frame()
-        prev_brightness = self.calc_mean_brightness(image)
+    def openCamera(self):
+        self.video_capture = cv2.VideoCapture(0)
+        # vc.set(5, 30)  #set FPS
+        self.video_capture.set(3, 640)  # set width
+        self.video_capture.set(4, 480)  # set height
 
-        # initial guess
-        if prev_brightness > 200:       # big number -> bright -> 1
-            recorded_morse.append("H")
-        else:
-            recorded_morse.append("L")
-        self.log.info(f"Intial Guess {recorded_morse[-1]}")
+        if not self.video_capture.isOpened():
+            self.log.error("Failed to open camera.")
+            msgBox = QtW.QMessageBox()
+            msgBox.setText("Failed to open camera.")
+            msgBox.exec_()
+            return False
 
-        tolerance = 0.25       # change must be at least 25% compared to before
-        frequency_delay = 1
-        while True:
-            image = self.get_frame()
-            brightness = self.calc_mean_brightness(image)
-            if brightness > prev_brightness * (1 + tolerance):      # significantly brighter than before
-                # change from dark to bright
-                recorded_morse.append("H")
-            elif prev_brightness > brightness * (1 + tolerance):    # significantly darker than before
-                # change from bright to dark
-                recorded_morse.append("L")
-            else:
-                last_item = len(recorded_morse) - 1
-                recorded_morse.append(recorded_morse[last_item])    # no change append last status again
-            time.sleep(frequency_delay)
-            self.log.info(recorded_morse[-1])   # log last entry
+    def get_image(self):
+        rval, frame = self.video_capture.read()
 
-    def __del__(self):
-        self.video_capture.release()
-        cv.destroyAllWindows()
-        self.log.info("Camera stopped")
-        return ()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+        image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
+        return frame, grey_frame, image

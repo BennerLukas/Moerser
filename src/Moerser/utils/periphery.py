@@ -2,7 +2,7 @@ from PySide2.QtGui import QImage
 from PySide2 import QtWidgets as QtW
 import cv2
 from Moerser.utils import set_logger
-
+from scipy.signal import convolve2d
 
 class Camera:
 
@@ -35,6 +35,6 @@ class Camera:
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+        thresh, bw_frame = cv2.threshold(grey_frame, 220, 255, cv2.THRESH_BINARY)
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-        return frame, grey_frame, image
+        return frame, grey_frame, bw_frame, image

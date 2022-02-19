@@ -19,7 +19,7 @@ startTime = time.time()
 
 while True:
     nowTime = time.time()
-    _, current_frame, _ = camera_p.get_image()
+    _, grey_frame, current_frame, _ = camera_p.get_image()
     frame_brightness = Camera.calc_mean_brightness(current_frame)
 
     # If first frame -> set avg brightness 2 threshold
@@ -35,10 +35,10 @@ while True:
 
     frame_count += 1
 
-    cv2.putText(current_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-    cv2.putText(current_frame, f"Decoded_Sequence: {decoded_sequence}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
-                (0, 0, 255), 2)
-    cv2.putText(current_frame, f"Current_sequence: {sequence}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255),
+    cv2.putText(grey_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125), 2)
+    cv2.putText(grey_frame, f"Decoded_Sequence: {decoded_sequence}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                (125, 125, 125), 2)
+    cv2.putText(grey_frame, f"Current_sequence: {sequence}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125),
                 2)
 
     cv2.imshow("webcam", current_frame)

@@ -157,6 +157,7 @@ class Interface(QtW.QWidget):
     def exec_analzye(self):
         self.log.debug("Analyze the Sequence to repair errors")
         # call analyze()
+        # TODO do analyze and maybe with custom sequence?
         text = self.m2t.decode(self.total_sequence)
         text = "This is a sample Text"
 
@@ -166,6 +167,7 @@ class Interface(QtW.QWidget):
         self.log.debug("Morse text to others via light")
         # open input field
         text = self._input()
+        # TODO flashing morse signal needed
 
     def get_image(self):    # TODO move to periphery
         rval, frame = self.video_capture.read()
@@ -184,7 +186,7 @@ class Interface(QtW.QWidget):
         pixmap = QPixmap.fromImage(image)
         self.label.setPixmap(pixmap)
 
-        self.total_sequence, bright_counter, darkness_counter = self.l2m.main(grey_frame)
+        self.total_sequence, bright_counter, darkness_counter = self.l2m.main(grey_frame)   # TODO needs other information
 
         self.log.debug(f"total_sequence: {self.total_sequence}")
         self.log.debug(f"bright_counter: {bright_counter}")

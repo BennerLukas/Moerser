@@ -1,6 +1,7 @@
 import time
 import webbrowser
 import sys
+from PySide2 import QtCore
 from PySide2.QtGui import QPixmap, QImage, QIcon
 from PySide2 import QtWidgets as QtW
 from PySide2.QtCore import QTimer
@@ -48,8 +49,10 @@ class Interface(QtW.QWidget):
 
         # Add a label
         self.label = QtW.QLabel()
-        self.label.setFixedSize(640, 640)
+        # self.label.setFixedWidth(800)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(self.label)
+        layout.setAlignment(QtCore.Qt.AlignCenter)
 
         # Add a text area
         self.results = QtW.QTextEdit()
@@ -57,7 +60,7 @@ class Interface(QtW.QWidget):
 
         # Set the layout
         self.setLayout(layout)
-        self.setFixedSize(640, 750)
+        self.setFixedSize(800, 800)
         self.setWindowIcon(QIcon("../assets/logo_simple_small.png"))
         self.setWindowIconText("logo")
 

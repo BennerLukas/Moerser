@@ -78,6 +78,7 @@ class Interpreter:
         return current_sequence
 
     def interpret_brightness(self, counter, frames=1):
+        sequence = ""
         if counter in range(1, (5 * frames)):  # Dit
             sequence = "."
 
@@ -90,6 +91,7 @@ class Interpreter:
         return sequence
 
     def interpret_darkness(self, counter, frames=1):
+        sequence = ""
         if counter in range(1, (4 * frames)):  # Next sequence in Letter
             sequence = ""
 

@@ -1,7 +1,5 @@
 import cv2
 import time
-from matplotlib import pyplot as plt
-from Moerser.utils import set_logger
 from Moerser.utils.periphery import Camera
 from Moerser.core.decoder import Decoder
 from Moerser.core.interpreter import Interpreter
@@ -35,10 +33,10 @@ while True:
 
     frame_count += 1
 
-    cv2.putText(grey_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125), 2)
-    cv2.putText(grey_frame, f"Decoded_Sequence: {decoded_sequence}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+    cv2.putText(current_frame, f"Morse_Code: {total_sequence}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125), 2)
+    cv2.putText(current_frame, f"Decoded_Sequence: {decoded_sequence}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                 (125, 125, 125), 2)
-    cv2.putText(grey_frame, f"Current_sequence: {sequence}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125),
+    cv2.putText(current_frame, f"Current_sequence: {sequence}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (125, 125, 125),
                 2)
 
     cv2.imshow("webcam", current_frame)

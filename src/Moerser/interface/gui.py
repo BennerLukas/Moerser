@@ -1,3 +1,5 @@
+import time
+import webbrowser
 import sys
 from PySide2.QtGui import QPixmap, QImage, QIcon
 from PySide2 import QtWidgets as QtW
@@ -17,7 +19,6 @@ class Interface(QtW.QWidget):
     def __init__(self):
         QtW.QWidget.__init__(self)
 
-        # self.l2m = Light2Morse()
         self.m2t = Decoder()
         self.t2l = Encoder()
         self.Camera = Camera()
@@ -26,7 +27,10 @@ class Interface(QtW.QWidget):
         self.log = set_logger("GUI", mode="debug")
 
         self.total_sequence = None
-        self.frame_counter = 800
+        self.frame_throttle = 1   # throttle limit
+        self.startTime = time.time()
+        self.nowTime = None
+
         self.video_capture = None
 
         # Create a timer.
@@ -87,11 +91,11 @@ class Interface(QtW.QWidget):
         sync.setIcon(QIcon("../assets/arrow-repeat.svg"))
         toolbar.addWidget(sync, 0, 2)
 
-        # Analyze Sequence
-        analyze = QtW.QPushButton("Analyze Sequence", self)
-        analyze.clicked.connect(self.exec_analzye)
-        analyze.setToolTip("Analyze the Sequence to repair errors")
-        analyze.setIcon(QIcon("../assets/search.svg"))
+        # Clear Sequence Sequence
+        analyze = QtW.QPushButton("Clear", self)
+        analyze.clicked.connect(self.exec_clear)
+        analyze.setToolTip("Clear the current output")
+        analyze.setIcon(QIcon("../assets/trash3.svg"))
         toolbar.addWidget(analyze, 1, 0)
 
         # Encode Text
@@ -100,6 +104,13 @@ class Interface(QtW.QWidget):
         encode.setToolTip("Morse text to others via light")
         encode.setIcon(QIcon("../assets/pencil.svg"))
         toolbar.addWidget(encode, 1, 1)
+
+        # Help
+        encode = QtW.QPushButton("Help", self)
+        encode.clicked.connect(self.exec_help)
+        encode.setToolTip("Link to the documentation")
+        encode.setIcon(QIcon("../assets/question-circle.svg"))
+        toolbar.addWidget(encode, 1, 2)
 
         # setting toolbar stylesheet
         # toolbar.setStyleSheet("background : lightgrey;")
@@ -143,41 +154,45 @@ class Interface(QtW.QWidget):
 
     def exec_sync(self):
         self.log.debug("init brightness again")
-        _, grey_frame, _ = self.Camera.get_image()
-        brightness_threshold = self.Interpreter.set_baseline(grey_frame)
+        _, grey_frame, bw_frame, _ = self.Camera.get_image()
+        brightness_threshold = self.Interpreter.set_baseline(bw_frame)
 
         self._dialog(text="Sync Done", detail_text=f"The brightness was calibrated again to {brightness_threshold}.")
 
-    def exec_analzye(self):
-        self.log.debug("Analyze the Sequence to repair errors")
-        # call analyze()
-        # TODO do analyze and maybe with custom sequence?
-        text = self.m2t.decode(self.total_sequence)
-        text = "This is a sample Text"
+    def exec_clear(self):
+        self.log.debug("Clear the current sequence")
+        self.total_sequence = ""
+        self.Interpreter = Interpreter()
+        self.results.setText("")
 
-        self._dialog(text="Analyze successful", detail_text=f"Following text is recognized: \n ----- \n {text}")
+        self._dialog(text="Clear successful", detail_text=f"Following sequence is deleted: \n ----- \n {self.total_sequence}")
 
     def exec_encode(self):
         self.log.debug("Morse text to others via light")
         # open input field
         text = self._input()
         seq = self.t2l.encode(text)
-        Blinker(seq)
+        Blinker(seq, self.frame_throttle)
+
+    def exec_help(self):
+        self.log.debug("Open help")
+        url = "https://github.com/BennerLukas/Moerser/"
+        webbrowser.open(url)
 
     # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
     def nextFrameSlot(self):
-        self.frame_counter += 1
+        self.nowTime = time.time()
 
-        frame, grey_frame, image = self.Camera.get_image()
+        frame, grey_frame, bw_frame, image = self.Camera.get_image()
 
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)
         self.label.setPixmap(pixmap)
 
-        if self.frame_counter < 25:
-            return False
-        else:
-            self.total_sequence, bright_counter, darkness_counter, translation, sequence = self.Interpreter.main(grey_frame)
+        if (self.nowTime - self.startTime) > self.frame_throttle:
+            self.log.debug(self.nowTime - self.startTime)
+
+            self.total_sequence, bright_counter, darkness_counter, translation, sequence = self.Interpreter.main(bw_frame)
 
             self.log.debug(f"total_sequence: {self.total_sequence}")
             self.log.debug(f"bright_counter: {bright_counter}")
@@ -187,8 +202,8 @@ class Interface(QtW.QWidget):
 
             text = f"Total Input: {self.total_sequence}\nCurrent Input: {sequence}\nTranslation: {translation}\nbright_counter: {bright_counter}    |    darkness_counter: {darkness_counter}"
             self.results.setText(text)
-            self.frame_counter = 0
-            return True
+            self.startTime = time.time()  # reset time
+        return True
 
 
 def main():

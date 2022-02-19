@@ -2,7 +2,7 @@ from PySide2.QtGui import QImage
 from PySide2 import QtWidgets as QtW
 import cv2
 from Moerser.utils import set_logger
-from scipy.signal import convolve2d
+
 
 class Camera:
 

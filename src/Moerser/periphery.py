@@ -5,13 +5,13 @@ import time
 
 class Camera:
 
-    def __init__(self, mode="debug"):
+    def __init__(self, camera_id, mode="debug"):
 
         self.debug_level = mode
         self.log = set_logger("Moerser - Camera", mode=mode)
 
-        self.video_capture = cv.VideoCapture(2)
-        self.video_capture = cv.VideoCapture(0)
+        #self.video_capture = cv.VideoCapture(camera_id)
+        self.video_capture = cv.VideoCapture(camera_id)
         self.log.debug("Camera starting")
         time.sleep(1)
         self.returned, self.frame = self.video_capture.read()

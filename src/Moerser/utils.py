@@ -3,7 +3,7 @@ import logging
 
 def get_morse_alphabet():
     morse_dict = {
-        '': 'Check',
+        #'': 'Check',
         '.-': 'a',
         '-...': 'b',
         '-.-.': 'c',

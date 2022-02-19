@@ -20,8 +20,8 @@ NAME = "Moerser"
 PACKAGES = find_packages("src")  # required
 PACKAGE_DIR = {"": "src"}
 VERSION = '0.1.0'
-DESCRIPTION = 'Autmatic Morsing System'
-AUTHOR = 'Lukas Benner'
+DESCRIPTION = 'Automatic Morsing System'
+AUTHOR = 'Moerser'
 LICENSE ="GNU General Public License v3.0"
 REQUIRES_PYTHON = ">=3.6.4"
 

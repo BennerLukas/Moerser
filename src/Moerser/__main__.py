@@ -1,3 +1,4 @@
+#For manual debugging
 import cv2
 import time
 from Moerser.utils.periphery import Camera

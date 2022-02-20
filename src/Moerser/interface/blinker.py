@@ -22,7 +22,8 @@ class Blinker:
 
     def ChangeColor(self):
         """
-
+        Changes the blinking color.
+        
         :return:
         """
         self.frame.config(bg=next(self.color_gen))

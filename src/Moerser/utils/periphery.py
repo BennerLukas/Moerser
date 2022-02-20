@@ -16,6 +16,8 @@ class Camera:
     @staticmethod
     def calc_mean_brightness(img):
         """
+        Calculates and returns the mean brightness
+        of any given frame.
 
         :param img:
         :return:
@@ -24,6 +26,7 @@ class Camera:
 
     def openCamera(self, camera_number=0):
         """
+        Inititates the camera stream.
 
         :param camera_number:
         :return:
@@ -42,6 +45,14 @@ class Camera:
 
     def get_image(self):
         """
+        Gets the current camera stream.
+        A number of different preprocessing is required
+        to correctly determine a change in brightness.
+        
+        bw_frame is the binary image that is used to 
+        filter out bright areas. The cut-off is set 
+        to 220 to make sure light sources (e.g. 
+        flashlight) are correctly registered.
 
         :return:
         """

@@ -22,6 +22,7 @@ class Interpreter:
     def set_baseline(self, current_frame):
         """
         sets the current frame as the base brightness
+        for further interpretation.
 
         :param current_frame:
         :return:
@@ -34,6 +35,13 @@ class Interpreter:
 
     def check_brightness(self, frame_brightness, tolerance=0.05):
         """
+        Checks if the current frame brightness is above
+        the baseline. Depending on the result, a counter
+        is incremented (bright-/darkness counter) to keep
+        track of signal length.
+        If there is a change in brightness, the singal 
+        length is interpreted and the result is appended
+        to the total sequence.
 
         :param frame_brightness:
         :param tolerance:
@@ -88,6 +96,10 @@ class Interpreter:
 
     def interpret_brightness(self, counter, frames=1):
         """
+        Interprets the brightness count:
+        1-4 --> Dit (short)
+        5-7 --> Dah (long)
+        8+  --> Delete last seq
 
         :param counter:
         :param frames:
@@ -107,6 +119,11 @@ class Interpreter:
 
     def interpret_darkness(self, counter, frames=1):
         """
+        Interprets the darkness count:
+        1-3 --> Next sequence (e.g. dit or dah)
+        4-6 --> Next letter in word
+        7+  --> Next word
+
 
         :param counter:
         :param frames:
@@ -126,6 +143,7 @@ class Interpreter:
 
     def main(self, current_frame):
         """
+        Orchestrates the interpretation.
 
         :param current_frame:
         :return:

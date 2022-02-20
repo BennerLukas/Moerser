@@ -16,7 +16,9 @@ class Encoder:
 
     def encode(self, text):
         """
-
+        orchestrates the encoding and visualization
+        of the morse sequence.
+        
         :param text:
         :return:
         """
@@ -26,6 +28,7 @@ class Encoder:
 
     def morse_encode(self, text):
         """
+        Translates a text to morse (Moerse Notation)
 
         :param text:
         :return:
@@ -60,6 +63,8 @@ class Encoder:
 
     def light_encode(self, morse_sequence):
         """
+        Creates sequence of frames to visualize/transmit
+        morse text
 
         :param morse_sequence:
         :return:

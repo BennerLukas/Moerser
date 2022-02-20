@@ -228,6 +228,8 @@ class Interface(QtW.QWidget):
     # https://stackoverflow.com/questions/41103148/capture-webcam-video-using-pyqt
     def nextFrameSlot(self):
         """
+        Periodically (depending on frame_throttle)
+        interprets a frame. 
 
         :return:
         """

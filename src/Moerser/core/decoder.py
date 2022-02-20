@@ -8,7 +8,7 @@ class Decoder:
 
     def decode(self, sequence):
         """
-        decipher an given sequence
+        decipher a given morse sequence
 
         :param sequence:
         :return:

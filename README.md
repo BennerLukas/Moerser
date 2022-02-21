@@ -34,10 +34,11 @@ For a demo video click [here](https://youtu.be/9dcBtRabC2M).
 <img src="./docs/UserInterface.png" alt="interface" align="center"/>
 
 
-A Graphical User Interface (GUI) makes the application of moerser a more streamlined experience. Upon starting the tool, the first frame will be automatically set as the brightness baseline. Should users wish to use another frame as the underlying baseline, then the "sync" function can be used. 
+A Graphical User Interface (GUI) makes the application of moerser a more streamlined experience. Upon starting the tool, the first frame will be automatically set as the brightness baseline. Should users wish to use another frame as the underlying baseline, then the "Sync" function can be used. 
 
-"clear" flushes the current interpreter and inititates new variables to start fresh. Interpreted sequences appear in a text box under "total Input" at the bottom of the screen. Any interpreted sequence is also decoded and presented in "Translation". The counters indicate how many frames that exceed the brightness threshold were counted. 
+"Clear" flushes the current interpreter and inititates new variables to start fresh. Interpreted sequences appear in a text box under "Total Input" at the bottom of the screen. Any interpreted sequence is also decoded and presented in "Translation". The counters indicate how many frames that exceed the brightness threshold were counted. 
 
+"Encode text" opens a text box for the user to enter a plain text sequence. This sequence is then coded to morse using the moerser notation. Like in the image above, a new window will open, playing the encoded text as a sequence of black and white frames.
 ## Standard Morse Notation
 
 <img src="./docs/International_Morse_Code.svg" alt="standard morse notation" align="center"/>
@@ -73,7 +74,7 @@ This approach works, although it is not very reliable as bright objects in the i
 
 <!-- image -->
 
-Another approach was to transform the image to black and white only. For that we applied a threshold to the grayscale image in which any pixel that was below the cut-off of  220 is set to black (0), otherwise it is set to white (250). That way the whole image, with exception of minor objects, is black. Any light source shone directly at the camera is above the cut-off and thus whate in the otherwise black frame. This method proved itself reliable and was therefore implemented in the moerser tool.
+Another approach was to transform the image to black and white only. For that we applied a threshold to the grayscale image in which any pixel that was below the cut-off of  220 is set to black (0), otherwise it is set to white (250). That way the whole image, with exception of minor objects, is black. Any light source shone directly at the camera is above the cut-off and thus white in the otherwise black frame. This method proved itself reliable and was therefore implemented in moerser.
 
     thresh, bw_frame = cv2.threshold(grey_frame, 220, 255, cv2.THRESH_BINARY)
 
@@ -85,4 +86,4 @@ Type | No light             |  Light |
 Grayscale | ![](./docs/gs_no_light.png)  |  ![](./docs/gs_light.png)
 Binary/BW| ![](./docs/bw_no_light.png)  |  ![](./docs/bw_light.png)
 
-While the average brightness changes in both types, the binary approach is more robust to changes in the background, e.g. shadows, objects moved into the frame etc. don't affect the average brightness in the BW frame whereas the grayscale frame is affected significantly. 
+While the average brightness changes in both types, the binary approach is more robust to changes in the background. Shadows, objects moved into the frame etc. don't affect the average brightness in the BW frame whereas the grayscale frame is affected significantly. 
